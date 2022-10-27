@@ -5,7 +5,7 @@ Auto-reply bot built with Selenium
 <br>
 <br>
 <br>
-Since when did you think that I was under the illusion that I was not using Kyoukasuigetsu?
+Since when have you been under the illusion that I was not using Kyoukasuigetsu?
 <br>
 <br>
 <br>
