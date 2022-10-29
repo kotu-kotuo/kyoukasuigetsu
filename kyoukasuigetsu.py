@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 from time import sleep
 import schedule
 import time
@@ -12,10 +13,23 @@ from dotenv import load_dotenv
 import os
 import traceback
 
+# Options
+options = Options()
+options.add_argument('--blink-settings=imagesEnabled=false')                    # 画像の非表示
+options.add_argument('--disable-blink-features=AutomationControlled')           # navigator.webdriver=false とする設定
+options.add_argument('--disable-browser-side-navigation')                       # Timed out receiving message from renderer: の修正
+options.add_argument('--disable-dev-shm-usage')                                 # ディスクのメモリスペースを使う
+options.add_argument('--disable-extensions')                                    # すべての拡張機能を無効
+options.add_argument('--disable-gpu')                                           # GPUハードウェアアクセラレーションを無効
+options.add_argument('--headless')                                              # ヘッドレスモードで起動
+options.add_argument('--ignore-certificate-errors')                             # SSL認証(この接続ではプライバシーが保護されません)を無効
+options.add_argument('--incognito')                                             # シークレットモードで起動
+options.add_argument('--no-sandbox')                                            # Chromeの保護機能を無効
+
 # ドライバの自動インストール
 service = ChromeService(executable_path=ChromeDriverManager().install())
 # ドライバの起動
-driver = webdriver.Chrome(service=service)
+driver = webdriver.Chrome(service=service, options=options)
 # 要素検索時のデフォルト待機時間(最大)
 driver.implicitly_wait(1)
 # 明示的な待機時間(最大)
@@ -75,7 +89,7 @@ def task():
     print("例外処理" + traceback.format_exc())
 
 # スケジュール設定
-schedule.every(30).to(599).seconds.do(task)
+schedule.every(30).to(5000).seconds.do(task)
 
 #スケジュール実行
 while True:
