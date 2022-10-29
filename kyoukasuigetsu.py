@@ -34,9 +34,8 @@ driver = webdriver.Chrome(service=service, options=options)
 driver.implicitly_wait(1)
 # 明示的な待機時間(最大)
 wait = WebDriverWait(driver, 10)
-# 環境変数
+# 環境変数読み込み
 load_dotenv()
-
 
 # ログイン用メールアドレス
 email = os.environ['EMAIL']
@@ -44,12 +43,17 @@ email = os.environ['EMAIL']
 password = os.environ['PASSWORD']
 # メッセージ
 message = os.environ['MESSAGE']
+# ホーム画面
+homePage = os.environ["HOME_URL"]
+# メッセージ画面
+messagePage = os.environ["MESSAGE_URL"]
+
 
 # スケジュールタスク
 def task():
   print("スタート")
   try:
-    driver.get("https://crowdworks.jp/login?ref=toppage_hedder")
+    driver.get(homePage)
     sleep(3)
     if driver.find_element(By.ID, "username"):
       driver.find_element(By.ID, "username").send_keys(email)
@@ -61,7 +65,7 @@ def task():
       wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "button-login"))).click()
       print("ログイン完了")
     sleep(3)
-    driver.get("https://crowdworks.jp/contracts/36515262")
+    driver.get(messagePage)
     print("ページ遷移")
     sleep(3)
     if driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[1]/div[2]/div/div[2]/a"):
