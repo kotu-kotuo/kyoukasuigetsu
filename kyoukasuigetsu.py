@@ -28,12 +28,6 @@ options.add_argument('--no-sandbox')                                            
 
 # ドライバの自動インストール
 service = ChromeService(executable_path=ChromeDriverManager().install())
-# ドライバの起動
-driver = webdriver.Chrome(service=service, options=options)
-# 要素検索時のデフォルト待機時間(最大)
-driver.implicitly_wait(1)
-# 明示的な待機時間(最大)
-wait = WebDriverWait(driver, 10)
 # 環境変数読み込み
 load_dotenv()
 
@@ -51,6 +45,13 @@ messagePage = os.environ["MESSAGE_URL"]
 
 # スケジュールタスク
 def task():
+  # ドライバーの起動
+  driver = webdriver.Chrome(service=service, options=options)
+  # 要素検索時のデフォルト待機時間(最大)
+  driver.implicitly_wait(1)
+  # 明示的な待機時間(最大)
+  wait = WebDriverWait(driver, 10)
+
   print("スタート")
   try:
     driver.get(homePage)
@@ -91,14 +92,13 @@ def task():
       raise Exception
   except Exception:
     print("例外処理" + traceback.format_exc())
+  driver.quit()
+
 
 # スケジュール設定
-schedule.every(30).to(5000).seconds.do(task)
+schedule.every(30).to(3000).seconds.do(task)
 
 #スケジュール実行
 while True:
     schedule.run_pending()
     sleep(1)
-
-# ブラウザの終了
-# driver.quit()
