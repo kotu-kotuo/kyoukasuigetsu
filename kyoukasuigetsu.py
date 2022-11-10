@@ -12,6 +12,8 @@ import time
 from dotenv import load_dotenv
 import os
 import traceback
+from datetime import datetime,date
+import random
 
 # Options
 options = Options()
@@ -76,7 +78,7 @@ def submit():
       print("ボタンが押せませんでした")
       raise Exception
     sleep(3)
-    unixtime = str(int(time.time()))
+    unixtime = str(int(time.time()) + random.randint(10,30))
     if driver.find_element(By.XPATH, "/html/body/div[14]/div[2]/form/div/p[2]/textarea"):
       driver.find_element(By.XPATH, "/html/body/div[14]/div[2]/form/div/p[2]/textarea").send_keys(message + unixtime)
       print("入力完了")
@@ -120,15 +122,19 @@ def sendMessage():
     driver.get(messagePage)
     print("ページ遷移")
     sleep(3)
-    unixtime = str(int(time.time()))
-    if driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[5]/div/div/div[6]/div/form/textarea"):
-      driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[5]/div/div/div[6]/div/form/textarea").send_keys(message + unixtime)
+    unixtime = str(int(time.time()) + random.randint(10,30))
+    sleep(3)
+    if driver.find_element(By.ID, "message_body"):
+      driver.find_element(By.ID, "message_body").send_keys(message + unixtime)
       print(message + unixtime)
     else:
       print("メッセージ入力できませんでした")
       raise Exception
     sleep(3)
-    if driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[5]/div/div/div[6]/div/form/div[3]/div[2]/div[1]/button"):
+    if driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[6]/div/div/div[6]/div/form/div[3]/div[2]/div[1]/button"):
+      wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div/div[6]/div/div/div[6]/div/form/div[3]/div[2]/div[1]/button"))).click()
+      print("メッセージ送れました!!")
+    elif driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[5]/div/div/div[6]/div/form/div[3]/div[2]/div[1]/button"):
       wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div/div[5]/div/div/div[6]/div/form/div[3]/div[2]/div[1]/button"))).click()
       print("メッセージ送れました!!")
     else:
@@ -139,10 +145,20 @@ def sendMessage():
   driver.quit()
 
 # スケジュール設定
-schedule.every(30).to(3000).seconds.do(submit)
-schedule.every(10000).to(180000).seconds.do(sendMessage)
+schedule.every(3000).to(10000).seconds.do(submit)
+schedule.every(1).to(70).seconds.do(sendMessage)
+
+# 時間設定
+year = date.today().year
+month = date.today().month
+untilHour = 23
+fromHour = 8
+set_until_time = datetime(year, month, date.today().day, untilHour, 59, 0)
+set_from_time = datetime(year, month, date.today().day, fromHour, 0, 0)
 
 #スケジュール実行
+# while set_from_time < datetime.now() < set_until_time:
 while True:
+  if set_from_time < datetime.now() < set_until_time:
     schedule.run_pending()
     sleep(1)
