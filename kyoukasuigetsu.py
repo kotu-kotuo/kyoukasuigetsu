@@ -78,7 +78,7 @@ def submit():
       print("ボタンが押せませんでした")
       raise Exception
     sleep(3)
-    unixtime = str(int(time.time()) + random.randint(10,30))
+    unixtime = str(int(time.time()) - random.randint(10,30))
     if driver.find_element(By.XPATH, "/html/body/div[14]/div[2]/form/div/p[2]/textarea"):
       driver.find_element(By.XPATH, "/html/body/div[14]/div[2]/form/div/p[2]/textarea").send_keys(message + unixtime)
       print("入力完了")
@@ -89,12 +89,84 @@ def submit():
     if driver.find_elements(By.XPATH, "/html/body/div[14]/div[2]/form/div/p[5]/input[2]"):
       wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[14]/div[2]/form/div/p[5]/input[2]"))).click()
       print(message + unixtime)
+      print("納品完了しました!!")
     else:
       print("送信できませんでした")
       raise Exception
   except Exception:
     print("例外処理" + traceback.format_exc())
   driver.quit()
+
+# 同意しないタスク
+def disagree():
+  # ドライバーの起動
+  driver = webdriver.Chrome(service=service, options=options)
+  # 要素検索時のデフォルト待機時間(最大)
+  driver.implicitly_wait(1)
+  # 明示的な待機時間(最大)
+  wait = WebDriverWait(driver, 10)
+
+  print("スタート")
+  try:
+    driver.get(homePage)
+    sleep(3)
+    if driver.find_element(By.ID, "username"):
+      driver.find_element(By.ID, "username").send_keys(email)
+      print("ユーザーネーム入力")
+    if driver.find_element(By.ID, "password"):
+      driver.find_element(By.ID, "password").send_keys(password)
+      print("メールアドレス入力")
+    if driver.find_elements(By.CLASS_NAME, "button-login"):
+      wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "button-login"))).click()
+      print("ログイン完了")
+    sleep(3)
+    driver.get(messagePage)
+    print("ページ遷移")
+    sleep(3)
+    if driver.find_elements(By.XPATH, "/html/body/div[1]/div[2]/div/div[4]/ul/li[2]/a"):
+      wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div/div[4]/ul/li[2]/a"))).click()
+      print("同意しないボタンクリック")
+    else:
+      print("同意しないボタンが押せませんでした")
+      raise Exception
+    sleep(3)
+    unixtime = str(int(time.time()) - random.randint(10,30))
+    if driver.find_element(By.XPATH, "/html/body/div[15]/div[2]/form/div/p[2]/textarea"):
+      driver.find_element(By.XPATH, "/html/body/div[15]/div[2]/form/div/p[2]/textarea").send_keys(message + unixtime)
+      print("入力完了")
+    else:
+      print("入力できませんでした")
+      raise Exception
+    sleep(3)
+    if driver.find_elements(By.XPATH, "/html/body/div[15]/div[2]/form/div/p[3]/input"):
+      wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[15]/div[2]/form/div/p[3]/input"))).click()
+      print(message + unixtime)
+      print("同意しない送れました!!")
+    else:
+      print("送信できませんでした")
+      raise Exception
+  except Exception:
+    print("例外処理" + traceback.format_exc())
+  driver.quit()
+
+
+# スケジュール設定
+schedule.every(100).to(7000).seconds.do(submit)
+schedule.every(100).to(7000).seconds.do(disagree)
+
+# 時間設定
+year = date.today().year
+month = date.today().month
+untilHour = 23
+fromHour = 8
+set_until_time = datetime(year, month, date.today().day, untilHour, 59, 0)
+set_from_time = datetime(year, month, date.today().day, fromHour, 0, 0)
+
+#スケジュール実行
+while True:
+  # if set_from_time < datetime.now() < set_until_time:
+  schedule.run_pending()
+  sleep(1)
 
 # メッセージタスク
 def sendMessage():
@@ -121,9 +193,9 @@ def sendMessage():
     sleep(3)
     driver.get(messagePage)
     print("ページ遷移")
-    sleep(3)
+    sleep(5)
     unixtime = str(int(time.time()) + random.randint(10,30))
-    sleep(3)
+    sleep(5)
     if driver.find_element(By.ID, "message_body"):
       driver.find_element(By.ID, "message_body").send_keys(message + unixtime)
       print(message + unixtime)
@@ -143,22 +215,3 @@ def sendMessage():
   except Exception:
     print("例外処理" + traceback.format_exc())
   driver.quit()
-
-# スケジュール設定
-schedule.every(3000).to(10000).seconds.do(submit)
-schedule.every(1).to(70).seconds.do(sendMessage)
-
-# 時間設定
-year = date.today().year
-month = date.today().month
-untilHour = 23
-fromHour = 8
-set_until_time = datetime(year, month, date.today().day, untilHour, 59, 0)
-set_from_time = datetime(year, month, date.today().day, fromHour, 0, 0)
-
-#スケジュール実行
-# while set_from_time < datetime.now() < set_until_time:
-while True:
-  if set_from_time < datetime.now() < set_until_time:
-    schedule.run_pending()
-    sleep(1)
